@@ -117,7 +117,6 @@ export const asyncRouterMap = [
     path: '/system',
     component: Layout,
     redirect: '/system/index',
-    alwaysShow: true, // will always show the root menu
     meta: {
       title: '系统管理',
       icon: 'user'
@@ -153,6 +152,41 @@ export const asyncRouterMap = [
         name: 'Logs',
         meta: {
           title: '日志管理'
+        }
+      }
+    ]
+  },
+  {
+    path: '/report',
+    component: Layout,
+    redirect: '/report/index',
+    meta: {
+      title: '财务报表',
+      icon: 'user'
+    },
+    children: [
+      {
+        path: 'balance',
+        component: () => import('@/views/report/balance'),
+        name: 'Balance',
+        meta: {
+          title: '资产负责表'
+        }
+      },
+      {
+        path: 'cashflow',
+        component: () => import('@/views/report/cashflow'),
+        name: 'Cashflow',
+        meta: {
+          title: '现金流量表'
+        }
+      },
+      {
+        path: 'income',
+        component: () => import('@/views/report/income'),
+        name: 'Income',
+        meta: {
+          title: '利润表'
         }
       }
     ]
