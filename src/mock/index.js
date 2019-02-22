@@ -38,6 +38,9 @@ Mock.mock(/\/search\/user/, 'get', remoteSearchAPI.searchUser)
 Mock.mock(/\/transaction\/list/, 'get', transactionAPI.getList)
 
 // 系统管理
+Mock.mock(/\/system\/auths/, 'get', systemApi.getAuths)
 Mock.mock(/\/system\/users/, 'get', systemApi.getUsers)
+Mock.mock(/\/system\/orders/, 'get', systemApi.getOrders)
+Mock.mock(/\/system\/logs/, 'get', systemApi.getLogs)
 
 export default Mock

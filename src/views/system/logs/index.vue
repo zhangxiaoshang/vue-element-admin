@@ -1,10 +1,12 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.email" placeholder="请输入邮箱" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-select v-model="listQuery.type" placeholder="操作类型" clearable style="width: 120px" class="filter-item">
+        <el-option v-for="item in types" :key="item" :label="item" :value="item"/>
+      </el-select>
+      <el-input v-model="listQuery.api" placeholder="操作表名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
 
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
     </div>
 
     <el-table
@@ -20,24 +22,32 @@
         label="UID"
       />
       <el-table-column
-        prop="email"
-        label="邮箱"
+        prop="nickname"
+        label="用户昵称"
       />
       <el-table-column
         prop="phone"
         label="手机号码"
       />
       <el-table-column
-        prop="reg_time"
-        label="注册时间"
+        prop="api"
+        label="操作表名"
       />
       <el-table-column
-        prop="recharge_addr"
-        label="充值地址"
+        prop="type"
+        label="操作类型"
       />
       <el-table-column
-        prop="state"
-        label="状态"
+        prop="ip"
+        label="IP地址"
+      />
+      <el-table-column
+        prop="time"
+        label="操作时间"
+      />
+      <el-table-column
+        prop="mark"
+        label="操作说明"
       />
     </el-table>
 
@@ -46,7 +56,7 @@
 </template>
 
 <script>
-import { fetchUsers } from '@/api/system'
+import { fetchLogs } from '@/api/system'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -63,10 +73,11 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        email: ''
+        type: '',
+        api: ''
       },
-
-      downloadLoading: false
+      downloadLoading: false,
+      types: ['添加', '删除', '修改', '登录']
     }
   },
   created() {
@@ -75,37 +86,16 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchUsers(this.listQuery).then(response => {
+      fetchLogs(this.listQuery).then(response => {
         this.list = response.data.items
         this.total = response.data.total
 
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
+        this.listLoading = false
       })
     },
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
-    },
-
-    handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['uid', 'email', 'phone', 'state']
-        const filterVal = ['uid', 'email', 'phone', 'state']
-        const data = this.formatJson(filterVal, this.list)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
-        })
-        this.downloadLoading = false
-      })
-    },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => v[j]))
     }
   }
 }

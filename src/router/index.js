@@ -124,11 +124,35 @@ export const asyncRouterMap = [
     },
     children: [
       {
+        path: 'auth',
+        component: () => import('@/views/system/auth'),
+        name: 'Auth',
+        meta: {
+          title: '实名认证'
+        }
+      },
+      {
         path: 'users',
         component: () => import('@/views/system/users'),
         name: 'Users',
         meta: {
           title: '会员管理'
+        }
+      },
+      {
+        path: 'orders',
+        component: () => import('@/views/system/orders'),
+        name: 'Orders',
+        meta: {
+          title: '订单管理'
+        }
+      },
+      {
+        path: 'logs',
+        component: () => import('@/views/system/logs'),
+        name: 'Logs',
+        meta: {
+          title: '日志管理'
         }
       }
     ]

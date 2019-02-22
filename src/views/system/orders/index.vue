@@ -1,10 +1,20 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.email" placeholder="请输入邮箱" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-select v-model="listQuery.symbol" placeholder="币对" clearable style="width: 100px" class="filter-item">
+        <el-option v-for="item in symbols" :key="item" :label="item" :value="item"/>
+      </el-select>
+      <el-select v-model="listQuery.type" placeholder="订单类型" clearable style="width: 120px" class="filter-item">
+        <el-option v-for="item in types" :key="item" :label="item" :value="item"/>
+      </el-select>
+      <el-select v-model="listQuery.state" placeholder="订单状态" clearable style="width: 120px" class="filter-item">
+        <el-option v-for="item in status" :key="item" :label="item" :value="item"/>
+      </el-select>
+
+      <el-input v-model="listQuery.uid" placeholder="用户ID" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.id" placeholder="订单ID" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
 
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
     </div>
 
     <el-table
@@ -16,28 +26,50 @@
       style="width: 100%;"
     >
       <el-table-column
+        prop="id"
+        label="订单号"
+      />
+      <el-table-column
         prop="uid"
         label="UID"
       />
       <el-table-column
-        prop="email"
-        label="邮箱"
-      />
-      <el-table-column
-        prop="phone"
-        label="手机号码"
-      />
-      <el-table-column
-        prop="reg_time"
-        label="注册时间"
-      />
-      <el-table-column
-        prop="recharge_addr"
-        label="充值地址"
+        prop="type"
+        label="类型"
       />
       <el-table-column
         prop="state"
         label="状态"
+      />
+      <el-table-column
+        prop="time"
+        label="委托时间"
+        min-width="110"
+      />
+      <el-table-column
+        prop="volume"
+        label="委托数量"
+      />
+      <el-table-column
+        prop="price"
+        label="委托价格"
+      />
+      <el-table-column
+        prop="amount"
+        label="委托金额"
+        min-width="110"
+      />
+      <el-table-column
+        prop="trade_volume"
+        label="成交数量"
+      />
+      <el-table-column
+        prop="avg_price"
+        label="成交均价"
+      />
+      <el-table-column
+        prop="trade_amount"
+        label="成交金额"
       />
     </el-table>
 
@@ -46,7 +78,7 @@
 </template>
 
 <script>
-import { fetchUsers } from '@/api/system'
+import { fetchOrders } from '@/api/system'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -63,8 +95,15 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        email: ''
+        symbol: '',
+        type: '',
+        state: '',
+        id: '',
+        uid: ''
       },
+      symbols: ['btcusdt', 'ethbtc'],
+      types: ['买入', '卖出'],
+      status: ['新订单', '已撤单', '完全成交'],
 
       downloadLoading: false
     }
@@ -75,14 +114,11 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchUsers(this.listQuery).then(response => {
+      fetchOrders(this.listQuery).then(response => {
         this.list = response.data.items
         this.total = response.data.total
 
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
+        this.listLoading = false
       })
     },
     handleFilter() {

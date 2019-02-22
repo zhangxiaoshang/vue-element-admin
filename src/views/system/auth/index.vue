@@ -1,10 +1,16 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
+      <el-select v-model="listQuery.type" placeholder="证件类型" clearable style="width: 120px" class="filter-item">
+        <el-option v-for="item in types" :key="item" :label="item" :value="item"/>
+      </el-select>
+      <el-select v-model="listQuery.state" placeholder="认证状态" clearable style="width: 120px" class="filter-item">
+        <el-option v-for="item in status" :key="item" :label="item" :value="item"/>
+      </el-select>
+
       <el-input v-model="listQuery.email" placeholder="请输入邮箱" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
 
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
     </div>
 
     <el-table
@@ -28,12 +34,16 @@
         label="手机号码"
       />
       <el-table-column
-        prop="reg_time"
-        label="注册时间"
+        prop="time"
+        label="提交时间"
       />
       <el-table-column
-        prop="recharge_addr"
-        label="充值地址"
+        prop="update"
+        label="最近更新时间"
+      />
+      <el-table-column
+        prop="name"
+        label="实名"
       />
       <el-table-column
         prop="state"
@@ -46,12 +56,12 @@
 </template>
 
 <script>
-import { fetchUsers } from '@/api/system'
+import { fetchAuths } from '@/api/system'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
-  name: 'Users',
+  name: 'Auth',
   components: { Pagination },
   directives: { waves },
 
@@ -63,10 +73,12 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        email: ''
+        type: '',
+        state: ''
       },
-
-      downloadLoading: false
+      downloadLoading: false,
+      types: ['身份证', '护照'],
+      status: ['未审核', '通过', '未通过', '未认证']
     }
   },
   created() {
@@ -75,14 +87,11 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchUsers(this.listQuery).then(response => {
+      fetchAuths(this.listQuery).then(response => {
         this.list = response.data.items
         this.total = response.data.total
 
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
+        this.listLoading = false
       })
     },
     handleFilter() {
